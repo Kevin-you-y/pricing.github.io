@@ -157,13 +157,21 @@ function calculateTotal() {
     document.getElementById("profit").value = profit.toFixed(2);
 }
 
+// 账户信息存储
+const accounts = {
+    Kevin: '123',
+    Ivy: '456',
+    Paris: '789',
+    // 添加更多账户
+};
+
 document.getElementById('loginForm').addEventListener('submit', function(event) {
     event.preventDefault();
     const username = document.getElementById('username').value;
     const password = document.getElementById('password').value;
 
-    // 在这里进行验证，这里是一个示例，实际应用中应该使用安全的验证方法
-    if (username === 'kevin' && password === '123') {
+    // 验证用户名和密码
+    if (accounts[username] && accounts[username] === password) {
         document.querySelector('.login-container').style.display = 'none';
         document.getElementById('main-content').style.display = 'block';
     } else {
