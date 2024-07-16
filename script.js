@@ -173,9 +173,9 @@ function calculateTotal() {
 
 // 账户信息存储
 const accounts = {
-    user1: 'password1',
-    user2: 'password2',
-    user3: 'password3',
+    Kevin: 'qq123',
+    Ivy: 'ivy456',
+    Paris: 'wang789',
     // 添加更多账户
 };
 
