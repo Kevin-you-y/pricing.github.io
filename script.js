@@ -11,7 +11,7 @@ function loadProductData() {
             productData = data;
         })
         .catch(error => {
-            console.error('Error loading product data:', error);
+            console.error('加载产品数据出错：', error);
         });
 }
 
@@ -24,11 +24,11 @@ function addRow(rowData = {}) {
         <td data-label="产品名称"><select onchange="updateProductModels(this.parentNode.parentNode)"><option value="">选择产品名称</option></select></td>
         <td data-label="型号"><select onchange="updateUnitPrice(this.parentNode.parentNode)"><option value="">选择型号</option></select></td>
         <td data-label="数量"><input type="number" value="${rowData['quantity'] || ''}" oninput="calculateTotal()"></td>
-        <td data-label="单价"><input type="text" value="${rowData['unit_price'] || ''}" readonly></td>
+        <td data-label="单价"><input type="number" step="0.01" value="${rowData['unit_price'] || ''}" oninput="updateRoundedPrice(this.parentNode.parentNode)"></td>
         <td data-label="成本总价"><input type="text" value="" readonly></td>
         <td data-label="EXW单价（USD）"><input type="text" value="" readonly></td>
         <td data-label="取整报价"><input type="text" value="" readonly></td>
-        <td data-label="利润率（%）"><input type="text" value="" oninput="calculateTotal()"></td>
+        <td data-label="利润率（%）"><input type="number" step="0.01" value="" oninput="calculateTotal()"></td>
         <td data-label="EXW售价"><input type="text" value="" readonly></td>
         <td><button class="delete-btn" onclick="deleteRow(this)">X</button></td>
     `;
@@ -106,10 +106,24 @@ function updateUnitPrice(row, category = '', name = '', model = '') {
     const selectedModel = modelSelect.value;
 
     if (selectedType && selectedName && selectedModel && productData[selectedType][selectedName]) {
-        const unitPrice = productData[selectedType][selectedName]['prices'][selectedModel];
-        unitPriceInput.value = unitPrice;
+        const unitPrice = parseFloat(unitPriceInput.value) || productData[selectedType][selectedName]['prices'][selectedModel];
+        unitPriceInput.value = unitPrice.toFixed(2);
+        updateRoundedPrice(row);
         calculateTotal();
     }
+}
+
+function updateRoundedPrice(row) {
+    const exwPriceInput = row.cells[6].getElementsByTagName('input')[0];
+    const roundedPriceInput = row.cells[7].getElementsByTagName('input')[0];
+    const unitPriceInput = row.cells[4].getElementsByTagName('input')[0];
+
+    const unitPrice = parseFloat(unitPriceInput.value) || 0;
+    const exwPrice = unitPrice / parseFloat(document.getElementById("exchangeRate").value) || 0;
+    exwPriceInput.value = exwPrice.toFixed(2);
+
+    const roundedPrice = Math.ceil(exwPrice);
+    roundedPriceInput.value = roundedPrice.toFixed(2);
 }
 
 function calculateTotal() {
@@ -159,9 +173,9 @@ function calculateTotal() {
 
 // 账户信息存储
 const accounts = {
-    Kevin: '123',
-    Ivy: '456',
-    Paris: '789',
+    user1: 'password1',
+    user2: 'password2',
+    user3: 'password3',
     // 添加更多账户
 };
 
@@ -175,6 +189,6 @@ document.getElementById('loginForm').addEventListener('submit', function(event) 
         document.querySelector('.login-container').style.display = 'none';
         document.getElementById('main-content').style.display = 'block';
     } else {
-        alert('用户名或密码错误');
+        document.getElementById('loginMessage').textContent = '用户名或密码错误';
     }
 });
