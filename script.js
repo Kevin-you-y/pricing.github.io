@@ -22,7 +22,7 @@ function addRow(rowData = {}) {
     newRow.innerHTML = `
         <td data-label="产品类别"><select onchange="updateProductNames(this.parentNode.parentNode)"><option value="">选择产品类型</option>${Object.keys(productData).map(type => `<option value="${type}">${type}</option>`).join('')}</select></td>
         <td data-label="产品名称"><select onchange="updateProductModels(this.parentNode.parentNode)"><option value="">选择产品名称</option></select></td>
-        <td data-label="型号"><select onchange="updateUnitPrice(this.parentNode.parentNode)"><option value="">选择型号</option></select></td>
+        <td data-label="型号"><select onchange="updateUnitPriceAndCalculate(this.parentNode.parentNode)"><option value="">选择型号</option></select></td>
         <td data-label="数量"><input type="number" value="${rowData['quantity'] || ''}" oninput="calculateTotal()"></td>
         <td data-label="单价"><input type="number" step="0.01" value="${rowData['unit_price'] || ''}" oninput="updateRoundedPrice(this.parentNode.parentNode)"></td>
         <td data-label="成本总价"><input type="text" value="" readonly></td>
@@ -88,14 +88,15 @@ function updateProductModels(row, category = '', name = '', model = '') {
             option.textContent = model;
             modelSelect.appendChild(option);
         });
+
         if (category && name && model) {
             modelSelect.value = model;
-            updateUnitPrice(row, category, name, model);
+            updateUnitPriceAndCalculate(row, category, name, model); // 更新单价和相关计算
         }
     }
 }
 
-function updateUnitPrice(row, category = '', name = '', model = '') {
+function updateUnitPriceAndCalculate(row, category = '', name = '', model = '') {
     const typeSelect = row.cells[0].getElementsByTagName('select')[0];
     const nameSelect = row.cells[1].getElementsByTagName('select')[0];
     const modelSelect = row.cells[2].getElementsByTagName('select')[0];
@@ -106,7 +107,7 @@ function updateUnitPrice(row, category = '', name = '', model = '') {
     const selectedModel = modelSelect.value;
 
     if (selectedType && selectedName && selectedModel && productData[selectedType][selectedName]) {
-        const unitPrice = parseFloat(unitPriceInput.value) || productData[selectedType][selectedName]['prices'][selectedModel];
+        const unitPrice = productData[selectedType][selectedName]['prices'][selectedModel] || 0;
         unitPriceInput.value = unitPrice.toFixed(2);
         updateRoundedPrice(row);
         calculateTotal();
@@ -173,9 +174,9 @@ function calculateTotal() {
 
 // 账户信息存储
 const accounts = {
-    Kevin: 'qq123',
-    Ivy: 'ivy456',
-    Paris: 'wang789',
+    user1: 'password1',
+    user2: 'password2',
+    user3: 'password3',
     // 添加更多账户
 };
 
